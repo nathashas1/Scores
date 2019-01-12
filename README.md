@@ -11,16 +11,16 @@
 8. Run ./scores
 
 
-## Testing Restful Routes:
+### Testing Restful Routes:
 
-# To get list of all users that have received at least one test score
+1. To get list of all users that have received at least one test score
  Navigate to http://localhost:9000/students
 
-# To get list of the test results for the specified student,and provides the student's average score across all exams
+2. To get list of the test results for the specified student,and provides the student's average score across all exams
  Navigate to http://localhost:9000/students/{id}
 
-# To get lists of all the exams that have been recorded
+3. To get lists of all the exams that have been recorded
  Navigate to http://localhost:9000/exams
 
-# To lists all the results for the specified exam, and provides the average score across all students
+4. To lists all the results for the specified exam, and provides the average score across all students
  Navigate to http://localhost:9000/exams/{id}
