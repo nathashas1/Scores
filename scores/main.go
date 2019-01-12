@@ -11,8 +11,19 @@ import(
 )
 var students   = make(map[string][]student.Student)
 var studentAvgs = make(map[string]float32)
+var exams = make(map[string][]student.Student)
 var examAvgs = make(map[string]float32)
-var countExams = make(map[string]int)
+
+type StudentResponse struct {
+    Average   float32
+    Marks     []student.Student
+}
+
+type ExamResponse struct {
+    Average   float32
+    Marks     []student.Student
+}
+
 func main() {
 	go subScribeToStream()
 	setUpEndPoints() ;
@@ -67,11 +78,17 @@ func GetAllExams(w http.ResponseWriter, r *http.Request){
 
 func GetExam(w http.ResponseWriter, r *http.Request) {
     params := mux.Vars(r)
-      exam := params["number"]
-			sum,ok := examAvgs[exam]
+      number := params["number"]
+			sum,ok := examAvgs[number]
 			if ok {
-					avg  := sum/float32(countExams[exam])
-      	  json.NewEncoder(w).Encode(avg)
+					allMarks,_ := exams[number]
+					avg  := sum/float32(len(allMarks))
+					resp := & ExamResponse{
+						Average: avg,
+						Marks :allMarks,
+					}
+
+      	  json.NewEncoder(w).Encode(resp)
 			}else{
 				  json.NewEncoder(w).Encode("Exam not found!")
 			}
@@ -81,15 +98,17 @@ func GetExam(w http.ResponseWriter, r *http.Request) {
 
 func GetStudent(w http.ResponseWriter, r *http.Request) {
     params := mux.Vars(r)
-		fmt.Printf("%s\n", params["id"])
       name := params["id"]
 			sum,ok := studentAvgs[name]
 			if ok {
 					allMarks,_ := students[name]
-					avg  := sum/float32(len(allMarks))
-					  fmt.Printf("length= %f\n", float32(len(allMarks)))
-						fmt.Printf("sum= %f\n", sum)
-      	  json.NewEncoder(w).Encode(avg)
+				  	avg  := sum/float32(len(allMarks))
+						resp := & StudentResponse{
+							Average: avg,
+							Marks :allMarks,
+						}
+
+      	  json.NewEncoder(w).Encode(resp)
 			}else{
 				  json.NewEncoder(w).Encode("Student Not found")
 			}
@@ -112,12 +131,15 @@ func storeStudents(stud student.Student){
 }
 
 func storeExams(stud student.Student){
-	  _, ok := examAvgs[fmt.Sprint(stud.Exam)]
+	  studList, ok := exams[fmt.Sprint(stud.Exam)]
 		if ok{
-				examAvgs[fmt.Sprint(stud.Exam)] +=stud.Score;
-				countExams[fmt.Sprint(stud.Exam)] +=1;
+				studList = append(studList,stud)
+				exams[fmt.Sprint(stud.Exam)] = studList;
+				examAvgs[fmt.Sprint(stud.Exam)] +=stud.Score
 		}else{
+				var examList []student.Student
+				examList = append(examList,stud)
+				exams[fmt.Sprint(stud.Exam)] = examList
 				examAvgs[fmt.Sprint(stud.Exam)] = stud.Score
-				countExams[fmt.Sprint(stud.Exam)] =1;
 		}
 }

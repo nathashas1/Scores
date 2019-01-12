@@ -1,0 +1,26 @@
+
+## To get the project running:
+
+1. Go to $GOPATH
+2. Run go get github.com/gorilla/mux
+3. Run go get github.com/r3labs/sse
+4. clone the repo https://github.com/nathashas1/StudentScores.git
+5. Copy 'scores' directory from StudentScores/scores to current directory
+6. Run go install scores
+7. Go to $GOPATH/bin
+8. Run ./scores
+
+
+## Testing Restful Routes:
+
+# To get list of all users that have received at least one test score
+ Navigate to http://localhost:9000/students
+
+# To get list of the test results for the specified student,and provides the student's average score across all exams
+ Navigate to http://localhost:9000/students/{id}
+
+# To get lists of all the exams that have been recorded
+ Navigate to http://localhost:9000/exams
+
+# To lists all the results for the specified exam, and provides the average score across all students
+ Navigate to http://localhost:9000/exams/{id}
