@@ -24,7 +24,8 @@ func subScribeToStream(){
 	client.Subscribe("data", func(msg *sse.Event) {
 		err := json.Unmarshal([]byte(msg.Data), &stud)
 		if err == nil {
-			storeStudents(stud);
+			storeStudents(stud)
+			storeExams(stud)
 		}
 	})
 }
@@ -68,13 +69,11 @@ func GetExam(w http.ResponseWriter, r *http.Request) {
     params := mux.Vars(r)
       exam := params["number"]
 			sum,ok := examAvgs[exam]
-			 fmt.Println(sum)
-			 fmt.Println(countExams[exam])
 			if ok {
 					avg  := sum/float32(countExams[exam])
       	  json.NewEncoder(w).Encode(avg)
 			}else{
-				  json.NewEncoder(w).Encode(exam)
+				  json.NewEncoder(w).Encode("Exam not found!")
 			}
 }
 
@@ -101,19 +100,24 @@ func storeStudents(stud student.Student){
 			studList, ok := students[stud.StudentId]
 			if ok {
 					studList =append(studList,stud)
-					for _, studObj := range studList {
-							studObj.GetScore()
-					}
 					students[stud.StudentId]=studList
 					studentAvgs[stud.StudentId] +=stud.Score;
-					examAvgs[fmt.Sprint(stud.Exam)] +=stud.Score;
-					countExams[fmt.Sprint(stud.Exam)] +=1;
 			} else {
 					 var studentList []student.Student
 					 studentList=append(studentList,stud)
 					 students[stud.StudentId]=studentList
 					 studentAvgs[stud.StudentId] = stud.Score
-					 examAvgs[fmt.Sprint(stud.Exam)] = stud.Score
-					 countExams[fmt.Sprint(stud.Exam)] =1;
 			}
+
+}
+
+func storeExams(stud student.Student){
+	  _, ok := examAvgs[fmt.Sprint(stud.Exam)]
+		if ok{
+				examAvgs[fmt.Sprint(stud.Exam)] +=stud.Score;
+				countExams[fmt.Sprint(stud.Exam)] +=1;
+		}else{
+				examAvgs[fmt.Sprint(stud.Exam)] = stud.Score
+				countExams[fmt.Sprint(stud.Exam)] =1;
+		}
 }
