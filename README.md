@@ -2,10 +2,10 @@
 ## To get the project running:
 
 1. Go to $GOPATH
-2. Run go get github.com/gorilla/mux
-3. Run go get github.com/r3labs/sse
-4. clone the repo https://github.com/nathashas1/StudentScores.git
-5. Copy 'scores' directory from StudentScores/scores to current directory
+2. Run go get github.com/gorilla/mux (library used to implement rest endpoints)
+3. Run go get github.com/r3labs/sse (library used to listen to SSE)
+4. Clone the repo https://github.com/nathashas1/StudentScores.git
+5. Copy 'scores' directory from StudentScores/ to current directory
 6. Run go install scores
 7. Go to $GOPATH/bin
 8. Run ./scores
@@ -16,7 +16,7 @@
 1. To get list of all users that have received at least one test score
  Navigate to http://localhost:9000/students
 
-2. To get list of the test results for the specified student,and provides the student's average score across all exams
+2. To get list of the test results for the specified student, and provides the student's average score across all exams
  Navigate to http://localhost:9000/students/{id}
 
 3. To get lists of all the exams that have been recorded

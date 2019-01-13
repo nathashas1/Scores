@@ -10,9 +10,9 @@ import(
 	"fmt"
 )
 var students   = make(map[string][]student.Student)
-var studentAvgs = make(map[string]float32)
+var studentTotal = make(map[string]float32)
 var exams = make(map[string][]student.Student)
-var examAvgs = make(map[string]float32)
+var examTotal = make(map[string]float32)
 
 type StudentResponse struct {
     Average   float32
@@ -62,24 +62,20 @@ func GetAllStudents(w http.ResponseWriter, r *http.Request){
 
 
 func GetAllExams(w http.ResponseWriter, r *http.Request){
-			 var keys []int
-			var allExams = make(map[int]int)
-			for _, studArray := range students {
-				for _,studObj := range studArray {
-					allExams[studObj.Exam] = 1
-				}
-			}
-			for k := range allExams {
-        keys = append(keys, k)
-    }
-	    json.NewEncoder(w).Encode(keys)
+			var allExams = make([]string, len(exams))
+			index := 0
+		for name := range exams {
+			allExams[index] = name
+			index++
+		}
+	    json.NewEncoder(w).Encode(allExams)
 }
 
 
 func GetExam(w http.ResponseWriter, r *http.Request) {
     params := mux.Vars(r)
       number := params["number"]
-			sum,ok := examAvgs[number]
+			sum,ok := examTotal[number]
 			if ok {
 					allMarks,_ := exams[number]
 					avg  := sum/float32(len(allMarks))
@@ -99,7 +95,7 @@ func GetExam(w http.ResponseWriter, r *http.Request) {
 func GetStudent(w http.ResponseWriter, r *http.Request) {
     params := mux.Vars(r)
       name := params["id"]
-			sum,ok := studentAvgs[name]
+			sum,ok := studentTotal[name]
 			if ok {
 					allMarks,_ := students[name]
 				  	avg  := sum/float32(len(allMarks))
@@ -120,26 +116,26 @@ func storeStudents(stud student.Student){
 			if ok {
 					studList =append(studList,stud)
 					students[stud.StudentId]=studList
-					studentAvgs[stud.StudentId] +=stud.Score;
+					studentTotal[stud.StudentId] +=stud.Score;
 			} else {
 					 var studentList []student.Student
 					 studentList=append(studentList,stud)
 					 students[stud.StudentId]=studentList
-					 studentAvgs[stud.StudentId] = stud.Score
+					 studentTotal[stud.StudentId] = stud.Score
 			}
 
 }
 
 func storeExams(stud student.Student){
-	  studList, ok := exams[fmt.Sprint(stud.Exam)]
+	  exam, ok := exams[fmt.Sprint(stud.Exam)]
 		if ok{
-				studList = append(studList,stud)
-				exams[fmt.Sprint(stud.Exam)] = studList;
-				examAvgs[fmt.Sprint(stud.Exam)] +=stud.Score
+				exam = append(exam,stud)
+				exams[fmt.Sprint(stud.Exam)] = exam;
+				examTotal[fmt.Sprint(stud.Exam)] +=stud.Score
 		}else{
 				var examList []student.Student
 				examList = append(examList,stud)
 				exams[fmt.Sprint(stud.Exam)] = examList
-				examAvgs[fmt.Sprint(stud.Exam)] = stud.Score
+				examTotal[fmt.Sprint(stud.Exam)] = stud.Score
 		}
 }
